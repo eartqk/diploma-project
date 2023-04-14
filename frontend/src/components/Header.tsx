@@ -12,6 +12,7 @@ import {
   px,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { NavLink } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/sciencelink.svg";
 import UserButton from "./UserButton";
 
@@ -44,7 +45,7 @@ const useStyles = createStyles((theme) => ({
     justifyContent: "space-between",
     alignItems: "center",
     height: "100%",
-    maxWidth: "100%",
+    maxWidth: "1200px",
   },
 
   links: {
@@ -162,7 +163,11 @@ function CustomHeader() {
         </Group>
 
         <Box className={classes.user}>
+        <NavLink
+            to={"me"}
+          >
           <UserButton {...mockUser} />
+          </NavLink>
         </Box>
 
         <Burger

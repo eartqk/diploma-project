@@ -15,7 +15,7 @@ import {appName} from "../../utils/config";
 import { useNavigate } from "react-router-dom";
 
 const schema = Yup.object().shape({
-  email: Yup.string().required().email(),
+  username: Yup.string().required(),
   password: Yup.string().required(),
 });
 
@@ -26,10 +26,7 @@ const Login: React.FC = () => {
   const form = useForm({
     validate: yupResolver(schema),
     initialValues: {
-      token: "",
-      name: "",
-      surname: "",
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -48,10 +45,9 @@ const Login: React.FC = () => {
           <Title mb={10} order={2}>Добро пожаловать!</Title>
           <TextInput
             required
-            type="email"
-            label="Email"
-            placeholder="example@mail.com"
-            {...form.getInputProps("email")}
+            type="text"
+            label="Логин"
+            {...form.getInputProps("username")}
           />
           <PasswordInput
             label="Пароль"

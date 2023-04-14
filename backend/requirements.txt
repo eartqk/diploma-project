@@ -7,3 +7,4 @@ python-jose
 passlib[bcrypt]~=1.7.4
 python-multipart
 psycopg2
+alembic
