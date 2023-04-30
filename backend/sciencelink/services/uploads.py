@@ -20,6 +20,9 @@ class UploadsService:
             secure=False,
         )
 
+        if not self.client.bucket_exists('media'):
+            self.client.make_bucket('media')
+
     def _upload(self, file: UploadFile = File(...)) -> str:
         file_ext = file.filename.split('.')[-1]
         if file_ext not in ['jpg', 'jpeg', 'png', 'mp4']:
