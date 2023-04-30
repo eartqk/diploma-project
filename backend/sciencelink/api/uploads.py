@@ -7,9 +7,9 @@ from fastapi import (
 from typing import List
 
 # from ..models.auth import User
-from ..models.uploads import UploadsListResponse
+from sciencelink.models.uploads import UploadsListResponse
 # from ..services.auth import get_current_user
-from ..services.uploads import UploadsService
+from sciencelink.services.uploads import UploadsService
 
 router = APIRouter(
     prefix='/uploads',

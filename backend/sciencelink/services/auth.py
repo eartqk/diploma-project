@@ -6,10 +6,10 @@ from jose import jwt, JWTError
 from passlib.hash import bcrypt
 from pydantic import ValidationError
 
-from .. import tables
-from ..database import Session, get_session
-from ..models.auth import Token, User, UserCreate
-from ..settings import settings
+from sciencelink.db import tables
+from sciencelink.db.session import Session, get_session
+from sciencelink.models.auth import Token, User, UserCreate
+from sciencelink.settings import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/sign-in')
 

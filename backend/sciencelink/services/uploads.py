@@ -8,7 +8,7 @@ from minio.error import S3Error
 from uuid import uuid4
 from typing import List
 
-from ..settings import settings
+from sciencelink.settings import settings
 
 
 class UploadsService:

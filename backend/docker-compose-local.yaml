@@ -1,27 +1,22 @@
 version: '3'
 services:
-  # frontend:
-  #   build: ./frontend
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app
-
   backend:
-    build: ./backend
+    build: .
     ports:
       - "8000:8000"
     depends_on:
       - postgres
       - minio
     env_file:
-      - ./backend/.env
+      - .env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/sciencelink
       MINIO_ROOT_USER: minio_user
       MINIO_ROOT_PASSWORD: minio_password
       MINIO_HOST: minio:9000
     restart: always
+    networks:
+      - backend-network
 
 
   postgres:
@@ -40,6 +35,8 @@ services:
       timeout: 5s
       retries: 15
     restart: always
+    networks:
+      - backend-network
 
 
   minio:
@@ -53,6 +50,8 @@ services:
     volumes:
       - minio_data:/data
     restart: always
+    networks:
+      - backend-network
 
   # redis:
   #   image: 'bitnami/redis:latest'
@@ -66,3 +65,7 @@ volumes:
     driver: local
   pgdata:
     driver: local
+
+networks:
+  backend-network:
+    driver: bridge

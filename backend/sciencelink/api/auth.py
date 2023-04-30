@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from ..models.auth import (
+from sciencelink.models.auth import (
     User,
     UserCreate,
     Token,
 )
-from ..services.auth import AuthService, get_current_user
-
+from sciencelink.services.auth import AuthService, get_current_user
 
 router = APIRouter(
     prefix='/auth',
