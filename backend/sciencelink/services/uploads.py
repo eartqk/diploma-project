@@ -21,13 +21,13 @@ class UploadsService:
         )
 
     def _upload(self, file: UploadFile = File(...)) -> str:
+        file_ext = file.filename.split('.')[-1]
+        if file_ext not in ['jpg', 'jpeg', 'png', 'mp4']:
+            raise HTTPException(status_code=400, detail='File type not allowed.')
+
+        new_filename = uuid4().hex + '.' + file_ext
+
         try:
-            file_ext = file.filename.split('.')[-1]
-            if file_ext not in ['jpg', 'jpeg', 'png', 'mp4']:
-                raise HTTPException(status_code=400, detail='File type not allowed.')
-
-            new_filename = uuid4().hex + '.' + file_ext
-
             response = self.client.put_object(
                 bucket_name='media',
                 object_name=new_filename,
