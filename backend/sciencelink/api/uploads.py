@@ -9,7 +9,7 @@ from typing import List
 # from ..models.auth import User
 from sciencelink.models.uploads import UploadsListResponse
 # from ..services.auth import get_current_user
-from sciencelink.services.uploads import UploadsService
+from sciencelink.services.minio.uploads import UploadsService
 
 router = APIRouter(
     prefix='/uploads',

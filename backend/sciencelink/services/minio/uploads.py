@@ -1,3 +1,4 @@
+import json
 from fastapi import (
     File,
     UploadFile,
@@ -9,6 +10,7 @@ from uuid import uuid4
 from typing import List
 
 from sciencelink.settings import settings
+from .policies import media_download_policy
 
 
 class UploadsService:
@@ -22,6 +24,7 @@ class UploadsService:
 
         if not self.client.bucket_exists('media'):
             self.client.make_bucket('media')
+            self.client.set_bucket_policy('media', json.dumps(media_download_policy))
 
     def _upload(self, file: UploadFile = File(...)) -> str:
         file_ext = file.filename.split('.')[-1]
@@ -54,6 +57,3 @@ class UploadsService:
             name = self._upload(file)
             filenames.append(name)
         return filenames
-
-
-
