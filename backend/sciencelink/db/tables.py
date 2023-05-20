@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime, date
+from datetime import date
 from typing import List
 
-from sqlalchemy import Text, String, Date, DateTime, Integer, Boolean
-from sqlalchemy import func, Table, Column, ForeignKey
+from sqlalchemy import Text, String, Date, Integer, Boolean
+from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy.orm import declarative_base
 
 from .base import Base, DefaultIdBase, CreateTimestampMixin, UpdateTimestampMixin
 
