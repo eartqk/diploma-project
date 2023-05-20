@@ -5,8 +5,8 @@ import {
   Avatar,
   Text,
   createStyles,
+  Box,
 } from "@mantine/core";
-import { IconChevronRight } from "@tabler/icons-react";
 
 const useStyles = createStyles((theme) => ({
   user: {
@@ -23,35 +23,45 @@ const useStyles = createStyles((theme) => ({
           : theme.colors.gray[0],
     },
   },
+
+  name: {
+    [theme.fn.smallerThan("sm")]: {
+      display: "none",
+    },
+  },
 }));
 
 interface UserButtonProps extends UnstyledButtonProps {
-  image: string;
-  name: string;
+  avatar: string;
   email: string;
+  name: string;
+  surname: string;
   onClick?: () => void;
-  icon?: React.ReactNode;
 }
 
-function UserButton({ image, name, email, icon, ...others }: UserButtonProps) {
+function UserButton({
+  avatar,
+  name,
+  email,
+  surname,
+  ...others
+}: UserButtonProps) {
   const { classes } = useStyles();
 
   return (
     <UnstyledButton className={classes.user} {...others}>
       <Group>
-        <Avatar src={image} radius="xl" />
+        <Avatar src={avatar} radius="xl" />
 
-        <div style={{ flex: 1 }}>
+        <Box className={classes.name}>
           <Text size="sm" weight={500}>
-            {name}
+            {name} {surname}
           </Text>
 
           <Text color="dimmed" size="xs">
             {email}
           </Text>
-        </div>
-
-        {icon || <IconChevronRight size="0.9rem" stroke={1.5} />}
+        </Box>
       </Group>
     </UnstyledButton>
   );

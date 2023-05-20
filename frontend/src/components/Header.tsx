@@ -10,11 +10,14 @@ import {
   Box,
   rem,
   px,
+  Center,
+  Flex,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/sciencelink.svg";
 import UserButton from "./UserButton";
+import { mockUser } from "../utils/mock";
 
 const HEADER_HEIGHT = px(50);
 
@@ -49,12 +52,6 @@ const useStyles = createStyles((theme) => ({
   },
 
   links: {
-    [theme.fn.smallerThan("sm")]: {
-      display: "none",
-    },
-  },
-
-  user: {
     [theme.fn.smallerThan("sm")]: {
       display: "none",
     },
@@ -107,77 +104,67 @@ const useStyles = createStyles((theme) => ({
 function CustomHeader() {
   const links = [
     {
-      link: "/пососи",
-      label: "Пососи",
+      link: "/people",
+      label: "Люди",
     },
     {
-      link: "/pricing",
-      label: "Pricing",
+      link: "/org",
+      label: "Организации",
     },
     {
-      link: "/learn",
-      label: "Learn",
-    },
-    {
-      link: "/community",
-      label: "Community",
+      link: "/search",
+      label: "Поиск",
     },
   ];
 
-  const mockUser = {
-    image:
-      "https://images.unsplash.com/photo-1607988795691-3d0147b43231?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=255&q=80",
-    name: "Albert Einstein",
-    email: "a.einstein@sciencelink.com",
-  };
+  const navigate = useNavigate();
 
   const [opened, { toggle, close }] = useDisclosure(false);
   const [active, setActive] = useState(links[0].link);
   const { classes, cx } = useStyles();
 
   const items = links.map((link) => (
-    <a
+    <Link
       key={link.label}
-      href={link.link}
+      to={link.link}
       className={cx(classes.link, {
         [classes.linkActive]: active === link.link,
       })}
-      onClick={(event) => {
-        event.preventDefault();
+      onClick={() => {
         setActive(link.link);
         close();
       }}
     >
       {link.label}
-    </a>
+    </Link>
   ));
 
   return (
-    <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
+    <Header height={HEADER_HEIGHT} mb={15} className={classes.root}>
       <Container className={classes.header}>
         <Group spacing="xl">
-          <Logo height={28} width={121.25} />
+          <NavLink to="/">
+            <Center>
+              <Logo height={28} width={121.25} />
+            </Center>
+          </NavLink>
+
           <Group spacing={5} className={classes.links}>
             {items}
           </Group>
         </Group>
 
-        <Box className={classes.user}>
-        <NavLink
-            to={"me"}
-          >
-          <UserButton {...mockUser} />
-          </NavLink>
-        </Box>
+        <Flex align="center" gap={10}>
+          <UserButton onClick={() => navigate("me")} {...mockUser} />
+          <Burger
+            opened={opened}
+            onClick={toggle}
+            className={classes.burger}
+            size="sm"
+          />
+        </Flex>
 
-        <Burger
-          opened={opened}
-          onClick={toggle}
-          className={classes.burger}
-          size="sm"
-        />
-
-        <Transition transition="pop-top-right" duration={200} mounted={opened}>
+        <Transition transition="fade" duration={200} mounted={opened}>
           {(styles) => (
             <Paper className={classes.dropdown} withBorder style={styles}>
               {items}

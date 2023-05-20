@@ -1,5 +1,4 @@
-import { AppShell, MantineProvider } from "@mantine/core";
-import { useState } from "react";
+import { AppShell, Box, MantineProvider } from "@mantine/core";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
 
@@ -13,7 +12,9 @@ function App() {
         fixed
         header={<Header />}
       >
-        <Outlet />
+        <Box sx={{ margin: "auto", maxWidth: "1200px" }}>
+          <Outlet />
+        </Box>
       </AppShell>
     </MantineProvider>
   );
