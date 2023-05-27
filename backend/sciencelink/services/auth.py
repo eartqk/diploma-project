@@ -83,6 +83,8 @@ class AuthService:
             email=user_data.email,
             username=user_data.username,
             password_hash=self.hash_password(user_data.password),
+            name=user_data.name,
+            surname=user_data.surname,
         )
 
         self.session.add(user)
