@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class Country(BaseModel):
+class CountrySchema(BaseModel):
     id: int
     name: str
 

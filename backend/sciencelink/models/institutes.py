@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class Institute(BaseModel):
+class InstituteSchema(BaseModel):
     id: int
     name: str
 

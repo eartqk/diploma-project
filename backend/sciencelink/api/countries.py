@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 
-from sciencelink.models.countries import Country
+from sciencelink.models.countries import CountrySchema
 from sciencelink.services.countries import CountriesService
 
 
@@ -12,6 +12,6 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[Country])
+@router.get('/', response_model=List[CountrySchema])
 def get_countries(service: CountriesService = Depends()):
     return service.get_countries()
