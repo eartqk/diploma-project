@@ -7,4 +7,3 @@ class InstituteSchema(BaseModel):
 
     class Config:
         orm_mode = True
-        

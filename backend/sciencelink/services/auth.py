@@ -8,13 +8,13 @@ from pydantic import ValidationError
 
 from sciencelink.db import tables
 from sciencelink.db.session import Session, get_session
-from sciencelink.models.auth import Token, User, UserCreate
+from sciencelink.models.auth import Token, UserAuthSchema, CreateUserAuthSchema
 from sciencelink.settings import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/sign-in')
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> UserAuthSchema:
     return AuthService.validate_token(token)
 
 
@@ -28,7 +28,7 @@ class AuthService:
         return bcrypt.hash(password)
 
     @classmethod
-    def validate_token(cls, token: str) -> User:
+    def validate_token(cls, token: str) -> UserAuthSchema:
         exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Could not validate credentials',
@@ -49,7 +49,7 @@ class AuthService:
         user_data = payload.get('user')
 
         try:
-            user = User.parse_obj(user_data)
+            user = UserAuthSchema.parse_obj(user_data)
         except ValidationError:
             raise exception from None
 
@@ -57,7 +57,7 @@ class AuthService:
 
     @classmethod
     def create_token(cls, user: tables.User) -> Token:
-        user_data = User.from_orm(user)
+        user_data = UserAuthSchema.from_orm(user)
 
         now = datetime.utcnow()
         payload = {
@@ -78,7 +78,7 @@ class AuthService:
     def __init__(self, session: Session = Depends(get_session)):
         self.session = session
 
-    def register_new_user(self, user_data: UserCreate) -> Token:
+    def register_new_user(self, user_data: CreateUserAuthSchema) -> Token:
         user = tables.User(
             email=user_data.email,
             username=user_data.username,

@@ -11,6 +11,6 @@ class CountriesService:
     def __init__(self, session: Session = Depends(get_session)):
         self.session = session
 
-    def get_countries(self) -> List[CountrySchema]:
+    def get_countries(self) -> List[tables.Country]:
         return self.session.query(tables.Country).all()
     

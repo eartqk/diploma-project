@@ -6,7 +6,7 @@ from fastapi import (
 )
 from typing import List
 
-# from ..models.auth import User
+# from ..models.auth import UserAuthSchema
 from sciencelink.models.uploads import UploadsListResponse
 # from ..services.auth import get_current_user
 from sciencelink.services.minio.uploads import UploadsService

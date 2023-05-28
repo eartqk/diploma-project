@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from sciencelink.models.auth import (
-    User,
-    UserCreate,
+    UserAuthSchema,
+    CreateUserAuthSchema,
     Token,
 )
 from sciencelink.services.auth import AuthService, get_current_user
@@ -16,7 +16,7 @@ router = APIRouter(
 
 @router.post('/sign-up', response_model=Token)
 def sign_up(
-        user_data: UserCreate,
+        user_data: CreateUserAuthSchema,
         service: AuthService = Depends(),
 ):
     return service.register_new_user(user_data)
@@ -33,6 +33,6 @@ def sign_in(
     )
 
 
-@router.get('/user', response_model=User)
-def get_user(user: User = Depends(get_current_user)):
+@router.get('/user', response_model=UserAuthSchema)
+def get_user(user: UserAuthSchema = Depends(get_current_user)):
     return user
