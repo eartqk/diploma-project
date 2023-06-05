@@ -1,11 +1,13 @@
 from typing import List
 
 from fastapi import Depends, File, HTTPException, UploadFile, status
-from sqlalchemy.orm import joinedload
+from sqlalchemy import func, union_all
+from sqlalchemy.orm import aliased, joinedload
 
 from sciencelink.db import tables
 from sciencelink.db.session import Session, get_session
-from sciencelink.models.users import UpdateUserSchema, UserAvatarResponse
+from sciencelink.models.users import UpdateUserSchema, UserAvatarResponse, UserDetailsSchema, UserResponseSchema, \
+    UserShortResponseSchema
 from sciencelink.services.minio.uploads import UploadsService
 
 
@@ -34,8 +36,42 @@ class UsersService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User does not exists')
         return user
 
-    def get(self, user_id: int) -> tables.User:
-        return self._get(user_id)
+    def _get_user_details(self, user_id: int) -> UserDetailsSchema:
+        count_posts = self.session.query(tables.Post).filter_by(user_id=user_id).count()
+        count_followers = self.session.query(tables.follower_user).filter_by(followed_user_id=user_id).count()
+        count_following_users = self.session.query(tables.follower_user).filter_by(follower_user_id=user_id).count()
+        count_following_organizations = self.session.query(tables.Organization).filter_by(owner_id=user_id).count()
+
+        return UserDetailsSchema(
+            count_posts=count_posts,
+            count_followers=count_followers,
+            count_following_users=count_following_users,
+            count_following_organizations=count_following_organizations
+        )
+
+    def get(self, user_id: int, with_details: bool = False) -> UserResponseSchema:
+        user = self._get(user_id)
+        details = None
+
+        if with_details:
+            details = UserDetailsSchema.from_orm(self._get_user_details(user.id))
+
+        response = UserResponseSchema.from_orm(user)
+        response.details = details
+        return response
+
+    def get_users(self, skip: int = 0, limit: int = 30) -> List[tables.User]:
+        users = (
+            self.session
+            .query(tables.User)
+            .filter_by(
+                is_active=True
+            )
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+        return users
 
     def get_posts(self, user_id: int, skip: int = 0, limit: int = 30) -> List[tables.Post]:
         user = self._get(user_id)
@@ -76,7 +112,52 @@ class UsersService:
             file: UploadFile = File(...),
     ) -> UserAvatarResponse:
         user = self._get(user_id)
-        file_path = self.uploads_service.upload_file(file)
+        file_path = self.uploads_service.upload_file(file, only_picture=True)
         user.avatar_path = file_path
         self.session.commit()
         return UserAvatarResponse.from_orm(user)
+
+    def get_user_followers(self, user_id: int) -> List[tables.User]:
+        user = (
+            self.session
+            .query(tables.User)
+            .options(joinedload(tables.User.followers))
+            .filter_by(
+                id=user_id,
+                is_active=True,
+            )
+            .first()
+        )
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User does not exists')
+        return user.followers
+
+    def get_user_followed_users(self, user_id: int) -> List[tables.User]:
+        user = (
+            self.session
+            .query(tables.User)
+            .options(joinedload(tables.User.followed_users))
+            .filter_by(
+                id=user_id,
+                is_active=True,
+            )
+            .first()
+        )
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User does not exists')
+        return user.followed_users
+
+    def get_user_followed_organizations(self, user_id: int) -> List[tables.User]:
+        user = (
+            self.session
+            .query(tables.User)
+            .options(joinedload(tables.User.followed_orgs))
+            .filter_by(
+                id=user_id,
+                is_active=True,
+            )
+            .first()
+        )
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User does not exists')
+        return user.followed_orgs

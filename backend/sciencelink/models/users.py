@@ -37,6 +37,24 @@ class UserOwnerSchema(UserPostSchema):
     pass
 
 
+class UserShortResponseSchema(UserBaseSchema):
+    id: int
+    avatar_path: str | None
+
+    class Config:
+        orm_mode = True
+
+
+class UserDetailsSchema(BaseModel):
+    count_posts: int | None
+    count_followers: int | None
+    count_following_users: int | None
+    count_following_organizations: int | None
+
+    class Config:
+        orm_mode = True
+
+
 class UserResponseSchema(UserBaseSchema):
     id: int
 
@@ -48,8 +66,7 @@ class UserResponseSchema(UserBaseSchema):
     owned_organizations: List[OrganizationBaseResponseSchema] | None
     educations: List[EducationSchema] | None
 
-    # followers_count: int
-    # following_count: int
+    details: UserDetailsSchema | None
 
     class Config:
         orm_mode = True
