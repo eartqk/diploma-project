@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
+from typing import Annotated
 
-from fastapi import HTTPException, status, Depends
+from fastapi import Cookie, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.hash import bcrypt
@@ -16,6 +17,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/sign-in')
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> UserAuthSchema:
     return AuthService.validate_token(token)
+
+
+def get_current_user_from_cookies(access_token: str | None = Cookie(None)) -> UserAuthSchema:
+    return AuthService.validate_token(access_token)
 
 
 class AuthService:
@@ -43,7 +48,7 @@ class AuthService:
                 settings.jwt_secret,
                 algorithms=[settings.jwt_algorithm],
             )
-        except JWTError:
+        except (JWTError, AttributeError):
             raise exception from None
 
         user_data = payload.get('user')
@@ -113,5 +118,8 @@ class AuthService:
 
         if not self.verify_password(password, user.password_hash):
             raise exception
+
+        user.is_active = True
+        self.session.commit()
 
         return self.create_token(user)
