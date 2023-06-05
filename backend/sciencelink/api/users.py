@@ -1,12 +1,12 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, File, UploadFile, status
 from fastapi.openapi.models import Response
 
 from sciencelink.models.auth import UserAuthSchema
-from sciencelink.models.posts import PostSchema
-from sciencelink.models.users import UpdateUserSchema, UserSchema
-from sciencelink.services.auth import get_current_user
+from sciencelink.models.posts import PostResponseSchema
+from sciencelink.models.users import UpdateUserSchema, UserAvatarResponse, UserResponseSchema
+from sciencelink.services.auth import get_current_user_from_cookies
 from sciencelink.services.users import UsersService
 
 router = APIRouter(
@@ -20,7 +20,7 @@ router = APIRouter(
 #     pass
 
 
-@router.get('/{user_id}', response_model=UserSchema)
+@router.get('/{user_id}', response_model=UserResponseSchema)
 def get_user(
         user_id: int,
         service: UsersService = Depends(),
@@ -28,53 +28,53 @@ def get_user(
     return service.get(user_id)
 
 
-@router.get('/{user_id}/posts', response_model=List[PostSchema])
+@router.get('/{user_id}/posts', response_model=List[PostResponseSchema])
 def get_user_posts(
         user_id: int,
-        # add post paginator request and response
+        skip: int = 0,
+        limit: int = 30,
         service: UsersService = Depends(),
 ):
-    return service.get_posts(user_id)
+    return service.get_posts(user_id, skip, limit)
 
 
-@router.get('/')
-def get_user_organizations():
-    pass
+# @router.get('/')
+# def get_user_followers():
+#     pass
+#
+#
+# @router.get('/')
+# def get_user_followed_users():
+#     pass
+#
+#
+# @router.get('/')
+# def get_user_followed_organizations():
+#     pass
 
 
-@router.get('/')
-def get_user_education():
-    pass
-
-
-@router.get('/')
-def get_user_followers():
-    pass
-
-
-@router.get('/')
-def get_user_followed_users():
-    pass
-
-
-@router.get('/')
-def get_user_followed_organizations():
-    pass
-
-
-@router.put('/', response_model=UserSchema)
+@router.put('/', response_model=UserResponseSchema)
 def update_user(
         user_data: UpdateUserSchema,
-        user: UserAuthSchema = Depends(get_current_user),
+        user: UserAuthSchema = Depends(get_current_user_from_cookies),
         service: UsersService = Depends(),
 ):
     return service.update_user(user.id, user_data)
 
 
-@router.delete('/')
-def delete_user(
-        user: UserAuthSchema = Depends(get_current_user),
+@router.put('/avatar', response_model=UserAvatarResponse)
+def upload_avatar(
+        avatar_file: UploadFile | None = File(...),
+        user: UserAuthSchema = Depends(get_current_user_from_cookies),
         service: UsersService = Depends(),
 ):
-    service.delete_user(user.id)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    return service.upload_avatar(user.id, avatar_file)
+
+
+@router.delete('/', response_model=Response)
+def delete_user(
+        user: UserAuthSchema = Depends(get_current_user_from_cookies),
+        service: UsersService = Depends(),
+):
+    service.make_inactive(user.id)
+    return Response(status=status.HTTP_204_NO_CONTENT, description='The user inactive')

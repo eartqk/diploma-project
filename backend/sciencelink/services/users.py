@@ -1,22 +1,32 @@
 from typing import List
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, File, HTTPException, UploadFile, status
+from sqlalchemy.orm import joinedload
 
 from sciencelink.db import tables
 from sciencelink.db.session import Session, get_session
-from sciencelink.models.users import UpdateUserSchema
+from sciencelink.models.users import UpdateUserSchema, UserAvatarResponse
+from sciencelink.services.minio.uploads import UploadsService
 
 
 class UsersService:
-    def __init__(self, session: Session = Depends(get_session)):
+    def __init__(
+            self,
+            uploads_service: UploadsService = Depends(),
+            session: Session = Depends(get_session)
+    ):
+        self.uploads_service = uploads_service
         self.session = session
 
-    def _get(self, user_id: int) -> tables.User:
+    def _get(self, user_id: int, is_active: bool = True) -> tables.User:
         user = (
             self.session
             .query(tables.User)
+            .options(joinedload(tables.User.owned_organizations))
+            .options(joinedload(tables.User.educations).joinedload(tables.Education.institute))
             .filter_by(
                 id=user_id,
+                is_active=is_active,
             )
             .first()
         )
@@ -29,13 +39,14 @@ class UsersService:
 
     def get_posts(self, user_id: int, skip: int = 0, limit: int = 30) -> List[tables.Post]:
         user = self._get(user_id)
-
         posts = (
             self.session
             .query(tables.Post)
             .filter_by(
-                user_id=user_id,
+                user_id=user.id,
+                organization_id=None,
             )
+            .order_by(tables.Post.created_at.desc())
             .offset(skip)
             .limit(limit)
             .all()
@@ -49,7 +60,23 @@ class UsersService:
         self.session.commit()
         return user
 
-    def delete_user(self, user_id: int):
+    def make_inactive(self, user_id: int):
         user = self._get(user_id)
-        self.session.delete(user) # fix
+        user.is_active = False
         self.session.commit()
+
+    def make_active(self, user_id: int):
+        user = self._get(user_id, is_active=False)
+        user.is_active = True
+        self.session.commit()
+
+    def upload_avatar(
+            self,
+            user_id: int,
+            file: UploadFile = File(...),
+    ) -> UserAvatarResponse:
+        user = self._get(user_id)
+        file_path = self.uploads_service.upload_file(file)
+        user.avatar_path = file_path
+        self.session.commit()
+        return UserAvatarResponse.from_orm(user)
