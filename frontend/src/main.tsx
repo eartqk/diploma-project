@@ -7,8 +7,8 @@ import App from "./App";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import User from "./pages/User";
+import Users from "./pages/Users";
 import Me from "./pages/Me";
-import People from "./pages/People";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>
@@ -16,7 +16,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <Routes>
         <Route path="/" element={<App />}>
           <Route path="me" element={<Me />} />
-          <Route path="people" element={<People />}>
+          <Route path="users">
+            <Route index element={<Users />} />
             <Route path=":userId" element={<User />} />
           </Route>
         </Route>
