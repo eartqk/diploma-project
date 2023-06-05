@@ -13,7 +13,7 @@ import sciLinkApi from "../../store/sciLinkApi";
 import { useNavigate } from "react-router-dom";
 
 const schema = Yup.object().shape({
-  token: Yup.string().required(),
+  username: Yup.string().required(),
   name: Yup.string()
     .required()
     .min(2)
@@ -35,7 +35,7 @@ const SignUp: React.FC = () => {
   const form = useForm({
     validate: yupResolver(schema),
     initialValues: {
-      token: "",
+      username: "",
       name: "",
       surname: "",
       email: "",
@@ -54,7 +54,7 @@ const SignUp: React.FC = () => {
           })}
         >
           <Title order={2}>Регистрация</Title>
-          <TextInput required label="Токен" {...form.getInputProps("token")} />
+          <TextInput required label="Логин" {...form.getInputProps("username")} />
           <TextInput required label="Имя" {...form.getInputProps("name")} />
           <TextInput
             required
