@@ -6,7 +6,11 @@ import {
   Text,
   createStyles,
   Box,
+  ActionIcon,
 } from "@mantine/core";
+import sciLinkApi from "../store/sciLinkApi";
+import { IconLogout } from "@tabler/icons-react";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
   user: {
@@ -31,39 +35,37 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-interface UserButtonProps extends UnstyledButtonProps {
-  avatar: string;
-  email: string;
-  name: string;
-  surname: string;
-  onClick?: () => void;
-}
-
-function UserButton({
-  avatar,
-  name,
-  email,
-  surname,
-  ...others
-}: UserButtonProps) {
+function UserButton() {
   const { classes } = useStyles();
+  const { data } = sciLinkApi.useGetMeQuery();
+  const [logout] = sciLinkApi.useLogoutMutation();
+  const navigate = useNavigate();
 
   return (
-    <UnstyledButton className={classes.user} {...others}>
-      <Group>
-        <Avatar src={avatar} radius="xl" />
+    <>
+      <UnstyledButton
+        pr="xs"
+        onClick={() => navigate("me")}
+        className={classes.user}
+      >
+        <Group>
+          <Avatar src={`${import.meta.env.VITE_MEDIA_BASE_URL}/${data?.avatar_path}`} radius="xl" />
 
-        <Box className={classes.name}>
-          <Text size="sm" weight={500}>
-            {name} {surname}
-          </Text>
+          <Box className={classes.name}>
+            <Text size="sm" weight={500}>
+              {data?.name} {data?.surname}
+            </Text>
 
-          <Text color="dimmed" size="xs">
-            {email}
-          </Text>
-        </Box>
-      </Group>
-    </UnstyledButton>
+            <Text color="dimmed" size="xs">
+              {data?.email}
+            </Text>
+          </Box>
+        </Group>
+      </UnstyledButton>
+      <ActionIcon onClick={() => logout()}>
+        <IconLogout size="20px" />
+      </ActionIcon>
+    </>
   );
 }
 
