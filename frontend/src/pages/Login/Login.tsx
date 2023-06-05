@@ -8,10 +8,10 @@ import {
   PasswordInput,
   Center,
   Title,
-  Stack
+  Stack,
 } from "@mantine/core";
 import sciLinkApi from "../../store/sciLinkApi";
-import {appName} from "../../utils/config";
+import { appName } from "../../utils/config";
 import { useNavigate } from "react-router-dom";
 
 const schema = Yup.object().shape({
@@ -21,6 +21,7 @@ const schema = Yup.object().shape({
 
 const Login: React.FC = () => {
   const [login] = sciLinkApi.useLoginMutation();
+  const [getMe] = sciLinkApi.useLazyGetMeQuery();
   const navigate = useNavigate();
 
   const form = useForm({
@@ -38,11 +39,16 @@ const Login: React.FC = () => {
           onSubmit={form.onSubmit((values) => {
             login(values)
               .unwrap()
+              .then(() => getMe())
               .then(() => navigate("/"));
           })}
         >
-          <Title order={4} color="dimmed">{appName}</Title>
-          <Title mb={10} order={2}>Добро пожаловать!</Title>
+          <Title order={4} color="dimmed">
+            {appName}
+          </Title>
+          <Title mb={10} order={2}>
+            Добро пожаловать!
+          </Title>
           <TextInput
             required
             type="text"
