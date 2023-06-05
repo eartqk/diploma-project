@@ -42,14 +42,16 @@ def create_post(
     return posts_service.create_post(user.id, post_data)
 
 
-# @router.post('/organization/{organization_id}')
-# def create_post_by_organization(
-#         post_data: CreatePostSchema,
-#         organization_id: int,
-#         user: UserAuthSchema = Depends(get_current_user_from_cookies),
-#         posts_service: PostsService = Depends(),
-# ) -> PostResponseSchema:
-#     return posts_service.create_post(user.id, post_data)
+@router.post('/organization/{organization_id}')
+def create_post_by_organization(
+        post_data: CreatePostSchema,
+        organization_id: int,
+        user: UserAuthSchema = Depends(get_current_user_from_cookies),
+        posts_service: PostsService = Depends(),
+) -> PostResponseSchema:
+    return posts_service.create_post(
+        user_id=user.id, org_id=organization_id, post_data=post_data
+    )
 
 
 @router.put('/{post_id}')

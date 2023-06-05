@@ -24,7 +24,7 @@ class PostResponseSchema(PostBaseSchema):
     updated_at: datetime | None
 
     user: UserPostSchema
-    organization: OrganizationPostSchema | None  # Change to org schema
+    organization: OrganizationPostSchema | None
 
     # comments/attachments/reactions count
 
