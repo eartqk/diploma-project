@@ -1,6 +1,4 @@
-import { User } from "../types/common";
-
-export const mockUser: User = {
+export const mockUser = {
   id: 1,
   avatar:
     "https://images.unsplash.com/photo-1607988795691-3d0147b43231?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=255&q=80",
@@ -15,7 +13,7 @@ export const mockUser: User = {
   created_at: "March 10, 2023",
 };
 
-export const mockUser2: User = {
+export const mockUser2 = {
   id: 2,
   avatar:
     "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Tesla_circa_1890.jpeg/274px-Tesla_circa_1890.jpeg",
