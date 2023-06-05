@@ -117,8 +117,6 @@ function CustomHeader() {
     },
   ];
 
-  const navigate = useNavigate();
-
   const [opened, { toggle, close }] = useDisclosure(false);
   const [active, setActive] = useState(links[0].link);
   const { classes, cx } = useStyles();
@@ -155,7 +153,7 @@ function CustomHeader() {
         </Group>
 
         <Flex align="center" gap={10}>
-          <UserButton onClick={() => navigate("me")} {...mockUser} />
+          <UserButton />
           <Burger
             opened={opened}
             onClick={toggle}
