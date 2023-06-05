@@ -9,10 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mantine/core": "^6.0.4",
-    "@mantine/form": "^6.0.4",
+    "@mantine/core": "^6.0.13",
+    "@mantine/dates": "^6.0.13",
+    "@mantine/form": "^6.0.13",
+    "@mantine/hooks": "^6.0.13",
     "@reduxjs/toolkit": "^1.9.3",
     "@tabler/icons-react": "^2.12.0",
+    "date-fns": "^2.30.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
