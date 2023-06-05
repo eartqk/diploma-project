@@ -28,7 +28,6 @@ class OrganizationBaseResponseSchema(OrganizationBaseSchema):
 
 
 class OrganizationResponseSchema(OrganizationBaseResponseSchema):
-    id: int
     avatar_path: str | None
 
     owner: UserOwnerSchema
