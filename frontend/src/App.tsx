@@ -1,8 +1,18 @@
 import { AppShell, Box, MantineProvider } from "@mantine/core";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
+import sciLinkApi from "./store/sciLinkApi";
 
 function App() {
+  const { data, isError } = sciLinkApi.useGetMeQuery();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isError) {navigate("login")}
+  }, [isError]);
+
   return (
     <MantineProvider withNormalizeCSS withGlobalStyles>
       <AppShell
