@@ -104,7 +104,7 @@ const useStyles = createStyles((theme) => ({
 function CustomHeader() {
   const links = [
     {
-      link: "/people",
+      link: "/users",
       label: "Люди",
     },
     {
