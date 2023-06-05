@@ -53,26 +53,39 @@ class User(DefaultIdBase, CreateTimestampMixin):
         secondary=follower_user,
         primaryjoin=(follower_user.c.follower_user_id == id),
         secondaryjoin=(follower_user.c.followed_user_id == id),
-        backref=backref('followers', lazy='selectin'), lazy='selectin',
+        backref=backref('followers', lazy='dynamic'), lazy='dynamic',  # TODO: Rewrite without dynamic
     )
 
     followed_orgs: Mapped[List['Organization'] | None] = relationship(
         secondary=follower_organization, back_populates='followers',
-        lazy='selectin',
+        lazy='dynamic',  # TODO: Rewrite without dynamic
     )
 
-    def is_following(self, user):
+    def is_following_user(self, user):
         return self.followed_users.filter(
-            follower_user.c.followed_id == user.id
+            follower_user.c.followed_user_id == user.id
         ).count() > 0
 
-    def follow(self, user):
-        if not self.is_following(user):
+    def is_following_org(self, org):
+        return self.followed_orgs.filter(
+            follower_organization.c.followed_org_id == org.id
+        ).count() > 0
+
+    def follow_user(self, user):
+        if not self.is_following_user(user):
             self.followed_users.append(user)
 
-    def unfollow(self, user):
-        if self.is_following(user):
+    def unfollow_user(self, user):
+        if self.is_following_user(user):
             self.followed_users.remove(user)
+
+    def follow_org(self, org):
+        if not self.is_following_org(org):
+            self.followed_orgs.append(org)
+
+    def unfollow_org(self, org):
+        if self.is_following_org(org):
+            self.followed_orgs.remove(org)
 
 
 class Organization(DefaultIdBase, CreateTimestampMixin):
@@ -109,7 +122,7 @@ class Post(DefaultIdBase, CreateTimestampMixin, UpdateTimestampMixin):
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     user: Mapped['User'] = relationship(back_populates='posts', lazy='joined')
 
-    comments: Mapped[List['Comment'] | None] = relationship(back_populates='post')
+    comments: Mapped[List['Comment'] | None] = relationship(back_populates='post', )
     attachments: Mapped[List['Attachment'] | None] = relationship(back_populates='post', lazy='joined')
     reactions: Mapped[List['Reaction'] | None] = relationship(back_populates='post')
 
