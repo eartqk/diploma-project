@@ -65,4 +65,4 @@ def get_user(
         user: UserAuthSchema = Depends(get_current_user_from_cookies),
         service: UsersService = Depends(),
 ):
-    return service.get(user.id, with_details=True)
+    return service.get_user_with_details(user.id)

@@ -32,7 +32,7 @@ def get_user(
         user_id: int,
         service: UsersService = Depends(),
 ):
-    return service.get(user_id, with_details=True)
+    return service.get_user_with_details(user_id)
 
 
 @router.get('/{user_id}/posts', response_model=List[PostResponseSchema])

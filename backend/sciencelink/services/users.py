@@ -1,13 +1,13 @@
 from typing import List
 
 from fastapi import Depends, File, HTTPException, UploadFile, status
-from sqlalchemy import func, union_all
-from sqlalchemy.orm import aliased, joinedload
+from sqlalchemy.orm import joinedload
 
 from sciencelink.db import tables
 from sciencelink.db.session import Session, get_session
-from sciencelink.models.users import UpdateUserSchema, UserAvatarResponse, UserDetailsSchema, UserResponseSchema, \
-    UserShortResponseSchema
+from sciencelink.models.users import (
+    UpdateUserSchema, UserAvatarResponse, UserDetailsSchema, UserResponseSchema
+)
 from sciencelink.services.minio.uploads import UploadsService
 
 
@@ -49,13 +49,12 @@ class UsersService:
             count_following_organizations=count_following_organizations
         )
 
-    def get(self, user_id: int, with_details: bool = False) -> UserResponseSchema:
+    def get(self, user_id: int) -> tables.User:
+        return self._get(user_id)
+
+    def get_user_with_details(self, user_id: int) -> UserResponseSchema:
         user = self._get(user_id)
-        details = None
-
-        if with_details:
-            details = UserDetailsSchema.from_orm(self._get_user_details(user.id))
-
+        details = UserDetailsSchema.from_orm(self._get_user_details(user.id))
         response = UserResponseSchema.from_orm(user)
         response.details = details
         return response
