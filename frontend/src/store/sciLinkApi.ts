@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const sciLinkApi = createApi({
   reducerPath: "sciLinkApi",
-  tagTypes: ["User", "Me", "Posts"],
+  tagTypes: ["User", "Me", "Post", "Users"],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     credentials: "include",
@@ -45,9 +45,17 @@ export const sciLinkApi = createApi({
       providesTags: ["User"],
     }),
 
+    getUsers: builder.query<Partial<User>[], void>({
+      query: () => "users",
+      providesTags: ["Users"],
+    }),
+
     getUserPosts: builder.query<Post[], string | undefined>({
       query: (user_id) => `users/${user_id}/posts`,
-      providesTags: ["Posts"],
+      providesTags: (result, error, arg) =>
+        result
+          ? [...result.map(({ id }) => ({ type: "Post" as const, id })), "Post"]
+          : ["Post"],
     }),
 
     editUser: builder.mutation<void, UserEdit>({
@@ -75,6 +83,37 @@ export const sciLinkApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["Me"],
+    }),
+
+    editPost: builder.mutation<
+      void,
+      { post_id: string; editText: { body: string } }
+    >({
+      query: ({ post_id, editText }) => ({
+        url: `posts/${post_id}`,
+        method: "PUT",
+        body: editText,
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Post", id: arg.post_id },
+      ],
+    }),
+
+    createPost: builder.mutation<void, { body: string }>({
+      query: (body) => ({
+        url: `posts`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Post"],
+    }),
+
+    deletePost: builder.mutation<void, string>({
+      query: (post_id) => ({
+        url: `posts/${post_id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: "Post", id: arg }],
     }),
   }),
 });
