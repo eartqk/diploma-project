@@ -12,11 +12,6 @@ router = APIRouter(
 )
 
 
-# @router.get('/')
-# def get_posts():
-#     pass
-
-
 @router.get('/{post_id}')
 def get_post(
         post_id: int,
