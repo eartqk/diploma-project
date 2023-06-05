@@ -13,6 +13,9 @@ class UserOwnerSchema(BaseModel):
     surname: str
     avatar_path: str | None
 
+    class Config:
+        orm_mode = True
+
 
 class OrganizationBaseSchema(BaseModel):
     name: str
@@ -40,3 +43,21 @@ class OrganizationPostSchema(BaseModel):
     id: int
     name: str
     avatar_path: str | None
+
+    class Config:
+        orm_mode = True
+
+
+class CreateOrganizationSchema(OrganizationBaseSchema):
+    pass
+
+
+class UpdateOrganizationSchema(OrganizationBaseSchema):
+    pass
+
+
+class OrganizationAvatarResponse(BaseModel):
+    avatar_path: str
+
+    class Config:
+        orm_mode = True
