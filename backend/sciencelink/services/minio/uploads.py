@@ -27,6 +27,9 @@ class UploadsService:
             self.client.set_bucket_policy('media', json.dumps(media_download_policy))
 
     def _upload(self, file: UploadFile = File(...)) -> str:
+        if not file:
+            raise HTTPException(status_code=400, detail='Must be a file.')
+
         file_ext = file.filename.split('.')[-1]
         if file_ext not in ['jpg', 'jpeg', 'png', 'mp4']:
             raise HTTPException(status_code=400, detail='File type not allowed.')
@@ -47,9 +50,8 @@ class UploadsService:
         except S3Error:
             raise HTTPException(status_code=500, detail='Failed to upload file.')
 
-    def upload_file(self, file: UploadFile = File(...)) -> List[str]:
-        filename = self._upload(file)
-        return [filename]
+    def upload_file(self, file: UploadFile = File(...)) -> str:
+        return self._upload(file)
 
     def upload_files(self, files: List[UploadFile] = File(...)) -> List[str]:
         filenames = []
