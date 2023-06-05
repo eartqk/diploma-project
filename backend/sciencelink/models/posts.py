@@ -1,5 +1,8 @@
-from pydantic import BaseModel, conint
+from datetime import datetime
 
+from pydantic import BaseModel
+
+from sciencelink.models.organizations import OrganizationPostSchema
 from sciencelink.models.users import UserPostSchema
 
 
@@ -11,10 +14,17 @@ class CreatePostSchema(PostBaseSchema):
     pass
 
 
-class PostSchema(PostBaseSchema):
+class UpdatePostSchema(PostBaseSchema):
+    pass
+
+
+class PostResponseSchema(PostBaseSchema):
     id: int
-    organization: str | None  # Change to org schema
+    created_at: datetime
+    updated_at: datetime | None
+
     user: UserPostSchema
+    organization: OrganizationPostSchema | None  # Change to org schema
 
     # comments/attachments/reactions count
 
