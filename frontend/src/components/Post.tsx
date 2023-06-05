@@ -32,6 +32,7 @@ const Post: React.FC<Post> = ({
   organization,
   likes,
 }) => {
+  const { data: me } = sciLinkApi.useGetMeQuery();
   const [deletePost] = sciLinkApi.useDeletePostMutation();
   const [editPost] = sciLinkApi.useEditPostMutation();
   const [isEditing, setEditing] = useState(false);
@@ -69,9 +70,11 @@ const Post: React.FC<Post> = ({
               </Group>
             </Stack>
           </Group>
-          <ActionIcon onClick={() => deletePost(id)}>
-            <IconTrash size="1.125rem" />
-          </ActionIcon>
+          {me?.id === user.id && (
+            <ActionIcon onClick={() => deletePost(id)}>
+              <IconTrash size="1.125rem" />
+            </ActionIcon>
+          )}
         </Group>
         {isEditing ? (
           <Textarea
@@ -103,14 +106,16 @@ const Post: React.FC<Post> = ({
             </ActionIcon>
           </Group>
         ) : (
-          <ActionIcon
-            onClick={() => {
-              setEditing(true);
-              setEditText(body);
-            }}
-          >
-            <IconEdit size="1.125rem" />
-          </ActionIcon>
+          me?.id === user.id && (
+            <ActionIcon
+              onClick={() => {
+                setEditing(true);
+                setEditText(body);
+              }}
+            >
+              <IconEdit size="1.125rem" />
+            </ActionIcon>
+          )
         )}
         <ActionIcon>
           <IconThumbUp size="1.125rem" />
