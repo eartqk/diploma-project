@@ -59,11 +59,51 @@ interface Post {
   organization: string;
   created_at: string;
   updated_at: string | null;
+  comments: {
+    body: string;
+    id: 2;
+    user: {
+      email: string;
+      username: string;
+      name: string;
+      surname: string;
+      id: string;
+      avatar_path: string;
+    };
+    post_id: string;
+    created_at: string;
+  }[];
   user: {
     id: string;
     username: string;
     name: string;
     surname: string;
     avatar_path: string | null;
+  };
+}
+
+interface Org {
+  name: string;
+  about: string;
+  id: string;
+  created_at: string;
+  avatar_path: string;
+  owner: {
+    id: string;
+    username: string;
+    name: string;
+    surname: string;
+    avatar_path: string;
+  };
+  institute: {
+    id: string;
+    name: string;
+  };
+  country: {
+    id: string;
+    name: string;
+  };
+  details: {
+    count_followers: string;
   };
 }
