@@ -10,6 +10,8 @@ import {
   Text,
   Textarea,
   Tooltip,
+  Button,
+  Paper,
 } from "@mantine/core";
 import { useState } from "react";
 import {
@@ -19,6 +21,7 @@ import {
   IconCheck,
   IconPencil,
   IconX,
+  IconMessageCircle2,
 } from "@tabler/icons-react";
 import sciLinkApi from "../store/sciLinkApi";
 import formatDate from "../utils/formatDate";
@@ -30,17 +33,20 @@ const Post: React.FC<Post> = ({
   updated_at,
   user,
   organization,
+  comments,
   likes,
 }) => {
   const { data: me } = sciLinkApi.useGetMeQuery();
   const [deletePost] = sciLinkApi.useDeletePostMutation();
   const [editPost] = sciLinkApi.useEditPostMutation();
+  const [addComment] = sciLinkApi.useAddCommentMutation();
   const [isEditing, setEditing] = useState(false);
   const [editText, setEditText] = useState("");
+  const [comment, setComment] = useState("");
 
   return (
     <Card withBorder shadow="xs" key={id}>
-      <Stack>
+      <Stack mb="md">
         <Group position="apart">
           <Group>
             <Avatar
@@ -89,6 +95,30 @@ const Post: React.FC<Post> = ({
           </Spoiler>
         )}
       </Stack>
+      <Stack spacing="xs">
+        {comments.map(({ body, id, user }) => (
+          <Paper withBorder p="8px">
+            <Stack>
+              <Group spacing="xs">
+                <Avatar
+                  size={30}
+                  src={`${import.meta.env.VITE_MEDIA_BASE_URL}/${
+                    user.avatar_path
+                  }`}
+                />
+                <Text size="sm">
+                  {user.name} {user.surname}
+                </Text>
+              </Group>
+              <Spoiler maxHeight={250} showLabel="Подробнее" hideLabel="Скрыть">
+                <Text size="sm" sx={{ whiteSpace: "pre-wrap" }}>
+                  {body}
+                </Text>
+              </Spoiler>
+            </Stack>
+          </Paper>
+        ))}
+      </Stack>
       <Group position="right" spacing="xs">
         {isEditing ? (
           <Group spacing={0}>
@@ -117,10 +147,32 @@ const Post: React.FC<Post> = ({
             </ActionIcon>
           )
         )}
-        <ActionIcon>
-          <IconThumbUp size="1.125rem" />
-        </ActionIcon>
-        <Text>{likes}</Text>
+
+        <Textarea
+          mt="10px"
+          placeholder="Комментарий.."
+          w="100%"
+          value={comment}
+          onChange={(event) => setComment(event.currentTarget.value)}
+          autosize
+        />
+        <Group w="100%" position="apart">
+          <Group>
+            <ActionIcon>
+              <IconThumbUp size="1.125rem" />
+            </ActionIcon>
+            <Text>{likes}</Text>
+          </Group>
+          <Button
+            onClick={() =>
+              addComment({ post_id: id, comment: { body: comment } })
+                .unwrap()
+                .then(() => setComment(""))
+            }
+          >
+            Ответить
+          </Button>
+        </Group>
       </Group>
     </Card>
   );
