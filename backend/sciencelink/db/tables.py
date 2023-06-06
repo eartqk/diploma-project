@@ -120,7 +120,7 @@ class Comment(DefaultIdBase, CreateTimestampMixin):
     __tablename__ = 'comment'
 
     post_id: Mapped[int] = mapped_column(ForeignKey('post.id'))
-    post: Mapped['Post'] = relationship(back_populates='comments')
+    post: Mapped['Post'] = relationship(back_populates='comments', lazy='joined')
 
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     user: Mapped['User'] = relationship(back_populates='comments', lazy='joined')
