@@ -112,7 +112,7 @@ const Me = () => {
                     <IconConfetti size={20} color={"#7999d2"} />
                     <Tooltip position="right" withArrow label="День рождения">
                       <Text align="center" color="dimmed">
-                        {formatDate(data?.birthday, "yyyy.MM.dd")}
+                        {formatDate(data?.birthday, "dd.MM.yyyy")}
                       </Text>
                     </Tooltip>
                   </Group>
@@ -131,7 +131,7 @@ const Me = () => {
                       label="Дата регистрации"
                     >
                       <Text color="dimmed">
-                        {formatDate(data.created_at, "yyyy.MM.dd")}
+                        {formatDate(data.created_at, "dd.MM.yyyy")}
                       </Text>
                     </Tooltip>
                   </Group>
@@ -161,7 +161,11 @@ const Me = () => {
                   <Paper p="2px">
                     <Text color="dimmed">Организации</Text>
                     <Group spacing={4}>
-                      <IconBuildingCommunity size={20} strokeWidth={2} color={"#7999d2"} />
+                      <IconBuildingCommunity
+                        size={20}
+                        strokeWidth={2}
+                        color={"#7999d2"}
+                      />
                       <Text color="dimmed">
                         {data?.details.count_following_organizations}
                       </Text>
