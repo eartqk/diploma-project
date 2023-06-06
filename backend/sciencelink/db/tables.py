@@ -53,7 +53,7 @@ class User(DefaultIdBase, CreateTimestampMixin):
         secondary=follower_user,
         primaryjoin=(follower_user.c.follower_user_id == id),
         secondaryjoin=(follower_user.c.followed_user_id == id),
-        backref=backref('followers', lazy='select'), lazy='select',  # TODO: Rewrite without dynamic
+        backref=backref('followers', lazy='select'), lazy='select',
     )
 
     followed_orgs: Mapped[List['Organization'] | None] = relationship(
