@@ -55,7 +55,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ close }) => {
   });
 
   return (
-    <Center pt="48px">
+    <Center>
       <Box sx={{ minWidth: 400 }} p="xs">
         <form
           onSubmit={form.onSubmit(({ birthday, ...values }) => {
@@ -76,13 +76,13 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ close }) => {
             {...form.getInputProps("surname")}
           />
           <Textarea
+            minRows={6}
             autosize
             label="Обо мне"
             required
             {...form.getInputProps("about")}
           />
           <DateInput
-            size="xs"
             valueFormat="YYYY-MM-DD"
             locale="ru"
             label="Дата рождения"
