@@ -8,6 +8,8 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import User from "./pages/User";
 import Users from "./pages/Users";
+import Orgs from "./pages/Orgs";
+import Org from "./pages/Org";
 import Me from "./pages/Me";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
@@ -19,6 +21,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           <Route path="users">
             <Route index element={<Users />} />
             <Route path=":userId" element={<User />} />
+          </Route>
+          <Route path="orgs">
+            <Route index element={<Orgs />} />
+            <Route path=":orgId" element={<Org />} />
           </Route>
         </Route>
         <Route path="signup" element={<SignUp />} />
