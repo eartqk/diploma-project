@@ -46,46 +46,20 @@ class User(DefaultIdBase, CreateTimestampMixin):
     owned_organizations: Mapped[List['Organization'] | None] = relationship(back_populates='owner', lazy='joined')
     educations: Mapped[List['Education'] | None] = relationship(back_populates='user', lazy='joined')
     posts: Mapped[List['Post'] | None] = relationship(back_populates='user')
-    comments: Mapped[List['Comment'] | None] = relationship(back_populates='user', cascade='all, delete-orphan')
-    reactions: Mapped[List['Reaction'] | None] = relationship(back_populates='user', cascade='all, delete-orphan')
+    comments: Mapped[List['Comment'] | None] = relationship(back_populates='user')
+    reactions: Mapped[List['Reaction'] | None] = relationship(back_populates='user')
 
     followed_users: Mapped[List['User']] = relationship(
         secondary=follower_user,
         primaryjoin=(follower_user.c.follower_user_id == id),
         secondaryjoin=(follower_user.c.followed_user_id == id),
-        backref=backref('followers', lazy='dynamic'), lazy='dynamic',  # TODO: Rewrite without dynamic
+        backref=backref('followers', lazy='select'), lazy='select',  # TODO: Rewrite without dynamic
     )
 
     followed_orgs: Mapped[List['Organization'] | None] = relationship(
         secondary=follower_organization, back_populates='followers',
-        lazy='dynamic',  # TODO: Rewrite without dynamic
+        lazy='select',
     )
-
-    def is_following_user(self, user):
-        return self.followed_users.filter(
-            follower_user.c.followed_user_id == user.id
-        ).count() > 0
-
-    def is_following_org(self, org):
-        return self.followed_orgs.filter(
-            follower_organization.c.followed_org_id == org.id
-        ).count() > 0
-
-    def follow_user(self, user):
-        if not self.is_following_user(user):
-            self.followed_users.append(user)
-
-    def unfollow_user(self, user):
-        if self.is_following_user(user):
-            self.followed_users.remove(user)
-
-    def follow_org(self, org):
-        if not self.is_following_org(org):
-            self.followed_orgs.append(org)
-
-    def unfollow_org(self, org):
-        if self.is_following_org(org):
-            self.followed_orgs.remove(org)
 
 
 class Organization(DefaultIdBase, CreateTimestampMixin):
