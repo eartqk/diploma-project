@@ -31,6 +31,13 @@ class OrganizationBaseResponseSchema(OrganizationBaseSchema):
         orm_mode = True
 
 
+class OrganizationDetailsSchema(BaseModel):
+    count_followers: int | None
+
+    class Config:
+        orm_mode = True
+
+
 class OrganizationResponseSchema(OrganizationBaseResponseSchema):
     avatar_path: str | None
 
@@ -38,6 +45,8 @@ class OrganizationResponseSchema(OrganizationBaseResponseSchema):
 
     institute: InstituteSchema | None
     country: CountrySchema | None
+
+    details: OrganizationDetailsSchema | None
 
 
 class OrganizationPostSchema(BaseModel):

@@ -1,12 +1,13 @@
 from typing import List
 
 from fastapi import Depends, File, HTTPException, UploadFile, status
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from sciencelink.db import tables
 from sciencelink.db.session import Session, get_session
 from sciencelink.models.organizations import CreateOrganizationSchema, OrganizationAvatarResponse, \
-    UpdateOrganizationSchema
+    OrganizationDetailsSchema, OrganizationResponseSchema, UpdateOrganizationSchema
 from sciencelink.services.minio.uploads import UploadsService
 from sciencelink.services.users import UsersService
 
@@ -35,8 +36,23 @@ class OrganizationsService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Organization not found.')
         return org
 
+    def _get_org_details(self, org_id) -> OrganizationDetailsSchema:
+        count_followers = (
+            self.session.query(tables.follower_organization)
+            .filter_by(followed_org_id=org_id)
+            .count()
+        )
+        return OrganizationDetailsSchema(count_followers=count_followers)
+
     def get(self, org_id: int) -> tables.Organization:
         return self._get(org_id)
+
+    def get_with_details(self, org_id: int) -> OrganizationResponseSchema:
+        org = self._get(org_id)
+        details = self._get_org_details(org_id)
+        response = OrganizationResponseSchema.from_orm(org)
+        response.details = details
+        return response
 
     def get_organizations(self, skip: int = 0, limit: int = 30) -> List[tables.Organization]:
         orgs = (
@@ -54,9 +70,11 @@ class OrganizationsService:
             .query(tables.Post)
             .options(joinedload(tables.Post.organization))
             .options(joinedload(tables.Post.user))
+            .options(joinedload(tables.Post.comments))
             .filter_by(
                 organization_id=org_id
             )
+            .order_by(tables.Post.created_at.desc())
             .offset(skip)
             .limit(limit)
             .all()
@@ -98,7 +116,7 @@ class OrganizationsService:
         org = self._get(org_id)
         self._check_permission(user, org)
         for field, value in org_data:
-            setattr(user, field, value)
+            setattr(org, field, value)
         self.session.commit()
         return org
 
@@ -113,9 +131,9 @@ class OrganizationsService:
         self.session.commit()
         return OrganizationAvatarResponse.from_orm(org)
 
-    def delete_org(self, user_id: int, org_id: int):
-        user = self.users_service.get(user_id)
-        org = self._get(org_id)
-        self._check_permission(user, org)
-        self.session.delete(org)
-        self.session.commit()
+    # def delete_org(self, user_id: int, org_id: int):
+    #     user = self.users_service.get(user_id)
+    #     org = self._get(org_id)
+    #     self._check_permission(user, org)
+    #     self.session.delete(org)
+    #     self.session.commit()
