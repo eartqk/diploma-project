@@ -2,10 +2,15 @@ from elasticsearch import Elasticsearch
 
 from fastapi import HTTPException
 
+from sciencelink.settings import settings
+
 
 class SearchService:
     def __init__(self):
-        self.es = Elasticsearch()
+        self.es = Elasticsearch(
+            "http://localhost:9200",
+            basic_auth=(settings.es_user, settings.es_password),
+        )
 
     def index_post(self, index_name, post_id, user_id, body):
         post_data = {

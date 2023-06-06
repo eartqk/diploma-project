@@ -20,5 +20,9 @@ class Settings(BaseSettings):
     minio_password: str = os.environ.get('MINIO_ROOT_PASSWORD', default='minio_password')
     minio_host: str = os.environ.get('MINIO_HOST', default='127.0.0.1:9000')
 
+    # ElasticSearch
+    es_user: str = os.environ.get('ELASTIC_USERNAME', default='admin')
+    es_password: str = os.environ.get('ELASTIC_PASSWORD', default='password')
+
 
 settings = Settings()
