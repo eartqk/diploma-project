@@ -10,11 +10,21 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isError) {navigate("login")}
+    if (isError) {
+      navigate("login");
+    }
   }, [isError]);
 
   return (
-    <MantineProvider withNormalizeCSS withGlobalStyles>
+    <MantineProvider
+      withNormalizeCSS
+      withGlobalStyles
+      theme={{
+        globalStyles: (theme) => ({
+        
+        }),
+      }}
+    >
       <AppShell
         sx={{
           padding: "0 10px",
