@@ -25,6 +25,7 @@ class OrganizationBaseSchema(BaseModel):
 class OrganizationBaseResponseSchema(OrganizationBaseSchema):
     id: int
     created_at: datetime
+    avatar_path: str | None
 
     class Config:
         orm_mode = True
