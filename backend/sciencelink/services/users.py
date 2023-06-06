@@ -120,11 +120,11 @@ class UsersService:
         user = (
             self.session
             .query(tables.User)
-            .options(joinedload(tables.User.followers))
             .filter_by(
                 id=user_id,
                 is_active=True,
             )
+            .options(joinedload(tables.User.followers))
             .first()
         )
         if not user:
@@ -135,11 +135,11 @@ class UsersService:
         user = (
             self.session
             .query(tables.User)
-            .options(joinedload(tables.User.followed_users))
             .filter_by(
                 id=user_id,
                 is_active=True,
             )
+            .options(joinedload(tables.User.followed_users))
             .first()
         )
         if not user:
@@ -150,11 +150,11 @@ class UsersService:
         user = (
             self.session
             .query(tables.User)
-            .options(joinedload(tables.User.followed_orgs))
             .filter_by(
                 id=user_id,
                 is_active=True,
             )
+            .options(joinedload(tables.User.followed_orgs))
             .first()
         )
         if not user:
