@@ -14,7 +14,7 @@ import {
   Flex,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/sciencelink.svg";
 import UserButton from "./UserButton";
 import { mockUser } from "../utils/mock";
@@ -104,36 +104,37 @@ const useStyles = createStyles((theme) => ({
 function CustomHeader() {
   const links = [
     {
-      link: "/users",
+      link: "users",
       label: "Люди",
     },
     {
-      link: "/org",
+      link: "orgs",
       label: "Организации",
     },
     {
-      link: "/search",
+      link: "search",
       label: "Поиск",
     },
   ];
 
+  const { pathname } = useLocation();
   const [opened, { toggle, close }] = useDisclosure(false);
   const [active, setActive] = useState(links[0].link);
   const { classes, cx } = useStyles();
 
-  const items = links.map((link) => (
+  const items = links.map(({ label, link }) => (
     <Link
-      key={link.label}
-      to={link.link}
+      key={label}
+      to={`/${link}`}
       className={cx(classes.link, {
-        [classes.linkActive]: active === link.link,
+        [classes.linkActive]: pathname.split("/")[1] === link,
       })}
       onClick={() => {
-        setActive(link.link);
+        setActive(link);
         close();
       }}
     >
-      {link.label}
+      {label}
     </Link>
   ));
 
