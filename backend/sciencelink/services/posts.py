@@ -1,8 +1,11 @@
-from fastapi import Depends, HTTPException, status
+from typing import List
+
+from fastapi import Depends, File, HTTPException, UploadFile, status
 
 from sciencelink.db import tables
 from sciencelink.db.session import Session, get_session
 from sciencelink.models.posts import CreatePostSchema, UpdatePostSchema
+from sciencelink.services.elasticsearch.search import SearchService
 from sciencelink.services.minio.uploads import UploadsService
 from sciencelink.services.organizations import OrganizationsService
 
@@ -12,6 +15,7 @@ class PostsService:
             self,
             uploads_service: UploadsService = Depends(),
             orgs_service: OrganizationsService = Depends(),
+            search_service: SearchService = Depends(),
             session: Session = Depends(get_session),
     ):
         self.uploads_service = uploads_service
@@ -56,8 +60,13 @@ class PostsService:
     def get(self, post_id) -> tables.Post:
         return self._get(post_id)
 
-    def get_post_comments(self, post_id):
-        pass
+    def get_post_comments(self, post_id) -> List[tables.Comment]:
+        return (
+            self.session.query(tables.Comment)
+            .filter_by(post_id=post_id)
+            .order_by(tables.Comment.created_at.asc())
+            .all()
+        )
 
     def update_post(
             self,
@@ -69,6 +78,35 @@ class PostsService:
         if post.user_id != user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Not permitted')
         post.body = post_data.body
+        self.session.commit()
+        return post
+
+    def upload_attachments(
+            self,
+            user_id: int,
+            post_id: int,
+            files: List[UploadFile] = File(...),
+    ) -> tables.Post:
+        post = self._get(post_id)
+        if post.user_id != user_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Not permitted')
+
+        attachments = []
+        if not files:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Empty files')
+        paths = self.uploads_service.upload_files(files)
+        for file, path in zip(files, paths):
+            attachments.append(
+                tables.Attachment(
+                    post_id=post.id,
+                    path=path,
+                )
+            )
+        if len(attachments) > 10:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail='Max 10 files at per post'
+            )
+        post.attachments = attachments
         self.session.commit()
         return post
 
