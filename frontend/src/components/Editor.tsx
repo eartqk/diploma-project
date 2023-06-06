@@ -1,10 +1,15 @@
 import { Textarea, Button, Stack } from "@mantine/core";
 import { useState } from "react";
 import sciLinkApi from "../store/sciLinkApi";
+import { useLocation, useParams } from "react-router-dom";
 
 const Editor = () => {
   const [value, setValue] = useState("");
-  const [post] = sciLinkApi.useCreatePostMutation();
+  const [userPost] = sciLinkApi.useCreatePostMutation();
+  const [orgPost] = sciLinkApi.useCreateOrgPostMutation();
+  const { pathname } = useLocation();
+  const { orgId } = useParams();
+
 
   return (
     <Stack align="flex-end">
@@ -16,7 +21,15 @@ const Editor = () => {
         minRows={4}
         label="Новая запись"
       />
-      <Button onClick={() => post({ body: value })}>Опубликовать</Button>
+      <Button
+        onClick={() =>
+          pathname.split("/")[1] === "orgs"
+            ? orgPost({ organization_id: orgId, post: { body: value } })
+            : userPost({ body: value })
+        }
+      >
+        Опубликовать
+      </Button>
     </Stack>
   );
 };
